@@ -1,58 +1,66 @@
 pipeline {
     agent any
 
-  
-
     stages {
-        stage ('Git Checkout') {
-        steps {
-          git branch: 'main', url: 'https://github.com/mo-ibrahim97/Dockerize-_.NET_-Application.git'
-        }
-         
-           
-        }
-     stage('CI') {
+        stage('Git Checkout') {
             steps {
-                // docker build 
+                git branch: 'main', url: 'https://github.com/mo-ibrahim97/Dockerize-_.NET_-Application.git'
+            }
+        }
+        stage('Preparation') {
+            steps {
+                //remove old containers
+                sh '''
+           echo ">>>>>>>>> Start Clearing old containers "
+            if docker ps -a | grep "mohamedebrahim979777/jenkines_02*" | awk '{print $1}' | xargs docker rm -f; then
+                printf 'Clearing old containers done succeeded\n'
+            else
+                printf 'Clearing old containers failed\n'
+            fi
+
+          '''
+
+          // remove old images
+
+                sh '''
+
+            echo ">>>>>>>>> Start Clearing old docker images"
+            if docker images -a | grep "ebrahim979777*" | awk '{print $1":"$2}' | xargs docker rmi -f; then
+                printf 'Clearing old images succeeded\n'
+            else
+                printf 'Clearing old images failed\n'
+            fi
+
+          '''
+            }
+        }
+        stage('CI') {
+            steps {
+                // docker build
                 withCredentials([usernamePassword(credentialsId: '0d38a0aa-7a52-4941-a134-5383af4daf0c', passwordVariable: 'password', usernameVariable: 'username')]) {
 
-
-                  
-               sh ''' docker build . -t mohamedebrahim979777/jenkines_02:v$BUILD_NUMBER
-                      docker login -u ${username} -p ${password}        
+                    sh ''' docker build . -t mohamedebrahim979777/jenkines_02:v$BUILD_NUMBER
+                      docker login -u ${username} -p ${password}
                       docker push  mohamedebrahim979777/jenkines_02:v$BUILD_NUMBER
-                      
 
-               ''' 
-
+               '''
+                }
             }
-
-            }  
         }
         stage('CD') {
             steps {
-                // docker run 
+                // docker run
                 withCredentials([usernamePassword(credentialsId: '0d38a0aa-7a52-4941-a134-5383af4daf0c', passwordVariable: 'password', usernameVariable: 'username')]) {
 
-
-                  
-               sh ''' 
-                      docker login -u ${username} -p ${password}        
+                    sh '''
+                      docker login -u ${username} -p ${password}
                       docker run -d -p 8070:80  mohamedebrahim979777/jenkines_02:v$BUILD_NUMBER
-                      
 
-               ''' 
-
+               '''
+                }
             }
-
-            }  
         }
-       
-
-
-
 
     }
-
 
 }
