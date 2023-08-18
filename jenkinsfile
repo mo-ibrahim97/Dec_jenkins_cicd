@@ -1,39 +1,40 @@
 pipeline {
     agent any
-    
+
+  
+
     stages {
-        stage('Build') {
-            steps {
-                echo 'Building the project...'
-                echo "from GITHUP&CODE01"
-                
-            }
+        stage ('Git Checkout') {
+        steps {
+          git branch: 'main', url: 'https://github.com/mo-ibrahim97/Dockerize-_.NET_-Application.git'
         }
-        
-        stage('Test') {
+         
+           
+        }
+     stage('CI') {
             steps {
-                echo 'Running tests...'
-                echo "from GITHUP&CODE01"
+                // docker build 
+                withCredentials([usernamePassword(credentialsId: '0d38a0aa-7a52-4941-a134-5383af4daf0c', passwordVariable: 'password', usernameVariable: 'username')]) {
 
-                
-            }
-        }
-        
-        stage('Deploy') {
-            steps {
-                echo 'Deploying the project...'
-                echo "from GITHUP&CODE01"
 
-                
-            }
-        }
-        stage('notify') {
-            steps {
-                echo 'Notify the project...'
-                echo "from GITHUP&CODE012"
+                  
+               sh ''' docker build . -t mohamedebrahim979777/jenkines_02:v$BUILD_NUMBER
+                      docker login -u ${username} -p ${password}        
+                      docker push  mohamedebrahim979777/jenkines_02:v$BUILD_NUMBER
+                      
 
-                
+               ''' 
+
             }
+
+            }  
         }
+       
+
+
+
+
     }
+
+
 }
