@@ -29,6 +29,24 @@ pipeline {
 
             }  
         }
+        stage('CD') {
+            steps {
+                // docker run 
+                withCredentials([usernamePassword(credentialsId: '0d38a0aa-7a52-4941-a134-5383af4daf0c', passwordVariable: 'password', usernameVariable: 'username')]) {
+
+
+                  
+               sh ''' 
+                      docker login -u ${username} -p ${password}        
+                      docker run -d -p 8070:80  mohamedebrahim979777/jenkines_02:v$BUILD_NUMBER
+                      
+
+               ''' 
+
+            }
+
+            }  
+        }
        
 
 
