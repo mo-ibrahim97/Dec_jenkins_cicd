@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent {label 'server01_aws'}
 
     stages {
         stage('Git Checkout') {
@@ -39,9 +39,9 @@ pipeline {
                 // docker build
                 withCredentials([usernamePassword(credentialsId: '0d38a0aa-7a52-4941-a134-5383af4daf0c', passwordVariable: 'password', usernameVariable: 'username')]) {
 
-                    sh ''' docker build . -t mohamedebrahim979777/jenkines_02:v$BUILD_NUMBER
-                      docker login -u ${username} -p ${password}
-                      docker push  mohamedebrahim979777/jenkines_02:v$BUILD_NUMBER
+                    sh ''' sudo  docker build . -t mohamedebrahim979777/jenkines_02:v$BUILD_NUMBER
+                       sudo docker login -u ${username} -p ${password}
+                      sudo docker push  mohamedebrahim979777/jenkines_02:v$BUILD_NUMBER
 
                '''
                 }
@@ -53,8 +53,8 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: '0d38a0aa-7a52-4941-a134-5383af4daf0c', passwordVariable: 'password', usernameVariable: 'username')]) {
 
                     sh '''
-                      docker login -u ${username} -p ${password}
-                      docker run -d -p 8070:80  mohamedebrahim979777/jenkines_02:v$BUILD_NUMBER
+                      sudo docker login -u ${username} -p ${password}
+                      sudo docker run -d -p 8070:80  mohamedebrahim979777/jenkines_02:v$BUILD_NUMBER
 
                '''
                 }
